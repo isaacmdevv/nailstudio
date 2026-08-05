@@ -21,11 +21,26 @@ export default function BookAppointmentPage() {
   const selectedService = watch('service_id');
 
   useEffect(() => {
-    if (selectedDate) {
-      const token = localStorage.getItem('token');
-      axios.get(`/appointments/available-slots?date=${selectedDate}`, { headers: { Authorization: `Bearer ${token}` } }).then(({ data }) => setSlots(data));
-    }
-  }, [selectedDate]);
+  if (!selectedDate) return;
+
+  const token = localStorage.getItem("token");
+
+  axios
+    .get(`/appointments/available-slots?date=${selectedDate}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then(({ data }) => {
+      console.log("Slots recibidos:", data);
+      setSlots(data);
+    })
+    .catch((error) => {
+      console.error("Status:", error.response?.status);
+      console.error("Data:", error.response?.data);
+      console.error(error);
+    });
+}, [selectedDate]);
 
   const onSubmit = async (data: any) => {
     const token = localStorage.getItem('token');
