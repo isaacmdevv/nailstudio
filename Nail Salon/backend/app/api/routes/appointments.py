@@ -7,6 +7,8 @@ from app.models.appointment import Appointment
 from app.models.service import Service
 from app.models.user import User
 from app.schemas.appointment import AppointmentCreate, AppointmentOut
+from datetime import date
+
 
 router = APIRouter(prefix='/appointments', tags=['appointments'])
 
@@ -94,18 +96,28 @@ def update_status(appointment_id: int, status: str, current_user: User = Depends
     return {'message': 'Appointment updated'}
 
 
-@router.get('/available-slots')
-def available_slots(date_value: str = Query(...), db: Session = Depends(get_db)):
-    appointments = db.query(Appointment).filter(Appointment.appointment_date == date_value, Appointment.status != 'cancelada').all()
+
+@router.get("/available-slots")
+def available_slots(
+    date: date = Query(...),
+    db: Session = Depends(get_db)
+):
+    appointments = db.query(Appointment).filter(
+        Appointment.appointment_date == date,
+        Appointment.status != "cancelada"
+    ).all()
+
     busy_times = {item.appointment_time for item in appointments}
+
     slots = [
-        {'date': date_value, 'time': '10:00'},
-        {'date': date_value, 'time': '11:00'},
-        {'date': date_value, 'time': '12:00'},
-        {'date': date_value, 'time': '13:00'},
-        {'date': date_value, 'time': '14:00'},
-        {'date': date_value, 'time': '15:00'},
-        {'date': date_value, 'time': '16:00'},
-        {'date': date_value, 'time': '17:00'},
+        {"date": date, "time": "10:00"},
+        {"date": date, "time": "11:00"},
+        {"date": date, "time": "12:00"},
+        {"date": date, "time": "13:00"},
+        {"date": date, "time": "14:00"},
+        {"date": date, "time": "15:00"},
+        {"date": date, "time": "16:00"},
+        {"date": date, "time": "17:00"},
     ]
-    return [slot for slot in slots if slot['time'] not in busy_times]
+
+    return [slot for slot in slots if slot["time"] not in busy_times]
